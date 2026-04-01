@@ -1,0 +1,4 @@
+name,age,gender,language,text,audio_path
+"re","5","Male","Tamil","hiiii","recordings\re_1774979873.wav"
+"gs","25","Female","Hindi","hello","recordings\gs_1774979987.wav"
+"as","34","Female","Marathi","erfgfvg","recordings\as_1775010682.wav"
