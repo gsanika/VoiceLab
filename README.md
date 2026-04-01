@@ -31,8 +31,13 @@ On Linux you may also need:
 ```bash
 sudo apt-get install portaudio19-dev
 ```
+### 2.Installation
+```bash
+pip install -r requirements.txt
+```
 
-### 2. Run the app
+
+### 3. Run the app
 
 ```bash
 streamlit run app.py
