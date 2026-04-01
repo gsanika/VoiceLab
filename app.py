@@ -9,7 +9,7 @@ import time
 # -------------------------
 st.set_page_config(page_title="Speech Collector", layout="centered")
 
-st.title("🎙️ VoiceLab — Speech Dataset Collector")
+st.title("🎙️ VoiceLab — Speech Data Collector")
 st.caption("Record speech easily (Browser-based 🎙️)")
 
 # -------------------------
@@ -37,7 +37,7 @@ with col2:
     ])
 
 # -------------------------
-# 🎤 AUDIO RECORDER (BEST PART)
+# AUDIO RECORDER
 # -------------------------
 st.subheader("🎙️ Record Audio")
 
@@ -48,15 +48,11 @@ audio = audiorecorder("▶️ Start Recording", "⏹️ Stop Recording")
 if len(audio) > 0:
     st.success("✅ Recording complete!")
 
+    # ✅ FIX: Export once and reuse — avoids empty bytes on second export
+    audio_bytes = audio.export().read()
+
     # Playback
-    st.audio(audio.export().read())
-
-    # Save file
-    filename = f"{name}_{int(time.time())}.wav"
-    filepath = os.path.join("recordings", filename)
-
-    with open(filepath, "wb") as f:
-        f.write(audio.export().read())
+    st.audio(audio_bytes)
 
     # -------------------------
     # TEXT INPUT
@@ -65,8 +61,15 @@ if len(audio) > 0:
 
     if st.button("💾 Save Data"):
         if not name or gender == "Select" or not text:
-            st.warning("⚠️ Fill all fields")
+            st.warning("⚠️ Please fill all fields before saving.")
         else:
+            # ✅ FIX: Moved filename & file save inside validation block
+            filename = f"{name}_{int(time.time())}.wav"
+            filepath = os.path.join("recordings", filename)
+
+            with open(filepath, "wb") as f:
+                f.write(audio_bytes)
+
             data = {
                 "name": name,
                 "age": age,
@@ -78,15 +81,18 @@ if len(audio) > 0:
 
             df = pd.DataFrame([data])
 
+            # ✅ FIX: Check file existence before writing so header is added only once
+            file_exists = os.path.exists("dataset.csv")
             df.to_csv(
                 "dataset.csv",
                 mode='a',
-                header=not os.path.exists("dataset.csv"),
+                header=not file_exists,
                 index=False,
                 quoting=1
             )
 
-            st.success("🎉 Data saved!")
+            st.success("🎉 Data saved successfully!")
+            st.balloons()
 
 # -------------------------
 # DATA PREVIEW
@@ -95,9 +101,10 @@ st.subheader("📊 Dataset Preview")
 
 if os.path.exists("dataset.csv"):
     df = pd.read_csv("dataset.csv", on_bad_lines='skip')
+    st.write(f"Total Records: **{len(df)}**")
     st.dataframe(df.tail(10))
 else:
-    st.info("No data yet")
+    st.info("No data recorded yet. Start recording to build your dataset!")
 
 # -------------------------
 # SIDEBAR
@@ -107,8 +114,16 @@ st.sidebar.write("""
 1. Fill user info  
 2. Click ▶️ to record  
 3. Click ⏹️ to stop  
-4. Enter text  
-5. Save  
+4. Enter what you said  
+5. Click 💾 Save  
 """)
 
 st.sidebar.success("🚀 Stable Recording Enabled!")
+
+st.sidebar.markdown("---")
+st.sidebar.title("📁 Dataset Info")
+if os.path.exists("dataset.csv"):
+    df_info = pd.read_csv("dataset.csv", on_bad_lines='skip')
+    st.sidebar.metric("Total Recordings", len(df_info))
+else:
+    st.sidebar.info("No dataset yet.")
