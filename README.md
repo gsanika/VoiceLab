@@ -21,23 +21,12 @@ A production-ready Streamlit app for collecting high-quality, labeled speech rec
 ## Setup
 
 ### 1. Install dependencies
-
-```bash
-pip install streamlit sounddevice scipy pandas
-```
-
-On Linux you may also need:
-
-```bash
-sudo apt-get install portaudio19-dev
-```
-### 2.Installation
 ```bash
 pip install -r requirements.txt
 ```
 
 
-### 3. Run the app
+### 2. Run the app
 
 ```bash
 streamlit run app.py
