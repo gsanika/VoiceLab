@@ -1,5 +1,5 @@
 import streamlit as st
-from audiorecorder import audiorecorder
+from audio_recorder_streamlit import audio_recorder
 import pandas as pd
 import os
 import time
@@ -9,7 +9,7 @@ import time
 # -------------------------
 st.set_page_config(page_title="Speech Collector", layout="centered")
 
-st.title("🎙️ VoiceLab — Speech Data Collector")
+st.title("🎙️ VoiceLab — Speech Dataset Collector")
 st.caption("Record speech easily (Browser-based 🎙️)")
 
 # -------------------------
@@ -40,19 +40,21 @@ with col2:
 # AUDIO RECORDER
 # -------------------------
 st.subheader("🎙️ Record Audio")
+st.info("Click 🎙️ to start recording, click again to stop")
 
-st.info("Click mic ▶️ speak ▶️ click again to stop")
+# ✅ audio_recorder returns WAV bytes directly — no pyaudio needed
+audio_bytes = audio_recorder(
+    text="Click to record",
+    recording_color="#e74c3c",
+    neutral_color="#2ecc71",
+    icon_size="2x"
+)
 
-audio = audiorecorder("▶️ Start Recording", "⏹️ Stop Recording")
-
-if len(audio) > 0:
+if audio_bytes:
     st.success("✅ Recording complete!")
 
-    # ✅ FIX: Export once and reuse — avoids empty bytes on second export
-    audio_bytes = audio.export().read()
-
     # Playback
-    st.audio(audio_bytes)
+    st.audio(audio_bytes, format="audio/wav")
 
     # -------------------------
     # TEXT INPUT
@@ -63,7 +65,7 @@ if len(audio) > 0:
         if not name or gender == "Select" or not text:
             st.warning("⚠️ Please fill all fields before saving.")
         else:
-            # ✅ FIX: Moved filename & file save inside validation block
+            # Save audio file only after validation
             filename = f"{name}_{int(time.time())}.wav"
             filepath = os.path.join("recordings", filename)
 
@@ -81,7 +83,6 @@ if len(audio) > 0:
 
             df = pd.DataFrame([data])
 
-            # ✅ FIX: Check file existence before writing so header is added only once
             file_exists = os.path.exists("dataset.csv")
             df.to_csv(
                 "dataset.csv",
@@ -112,8 +113,8 @@ else:
 st.sidebar.title("📘 Instructions")
 st.sidebar.write("""
 1. Fill user info  
-2. Click ▶️ to record  
-3. Click ⏹️ to stop  
+2. Click 🎙️ to record  
+3. Click again to stop  
 4. Enter what you said  
 5. Click 💾 Save  
 """)
