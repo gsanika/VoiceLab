@@ -9,7 +9,7 @@ import time
 # -------------------------
 st.set_page_config(page_title="Speech Collector", layout="centered")
 
-st.title("🎤 Speech Data Collection App")
+st.title("🎙️ VoiceLab — Speech Dataset Collector")
 st.caption("Record speech easily (Browser-based 🎙️)")
 
 # -------------------------
