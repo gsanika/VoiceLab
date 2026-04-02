@@ -100,8 +100,7 @@ project/
 ## Requirements
 
 ```
-streamlit>=1.28
-sounddevice>=0.4.6
-scipy>=1.11
-pandas>=2.0
+streamlit
+audio-recorder-streamlit
+pandas
 ```
